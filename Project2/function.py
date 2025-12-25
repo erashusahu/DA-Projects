@@ -64,4 +64,34 @@ def get_basic_info(cursor):
     return results
 
 
+def get_additonal_tables(cursor):
+    queries = {
+        "Suppliers Contact Details": "SELECT supplier_name, contact_name, email, phone FROM suppliers",
+
+        "Products with Supplier and Stock": """
+            SELECT 
+                p.product_name,
+                s.supplier_name,
+                p.stock_quantity,
+                p.reorder_level
+            FROM products p
+            JOIN suppliers s ON p.supplier_id = s.supplier_id
+            ORDER BY p.product_name ASC
+        """,
+
+        "Products Needing Reorder": """
+            SELECT product_name, stock_quantity, reorder_level
+            FROM products
+            WHERE stock_quantity <= reorder_level
+        """
+    }
+
+    tables = {}
+    for label, query in queries.items():
+        cursor.execute(query)
+        tables[label] = cursor.fetchall()
+
+    return tables
+
+
 
